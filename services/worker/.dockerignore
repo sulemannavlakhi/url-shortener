@@ -1,0 +1,16 @@
+.git
+.env
+.env.*
+
+bin/
+dist/
+build/
+
+*.log
+
+.vscode/
+.idea/
+
+.DS_Store
+Thumbs.db
+desktop.ini
