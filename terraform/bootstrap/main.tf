@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "ecsv2_s3" {
-  bucket = "sulemans3"
+  bucket = "sulemanecsv2s3"
 }
 
 resource "aws_s3_bucket_versioning" "s3_bucket_versioning" {
