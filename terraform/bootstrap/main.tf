@@ -18,12 +18,3 @@ resource "aws_s3_bucket_public_access_block" "s3_state" {
   ignore_public_acls      = true
   restrict_public_buckets = true
 }
-
-resource "aws_ecr_repository" "ecsv2" {
-  name                 = "ecsv2-project"
-  image_tag_mutability = "MUTABLE"
-
-  image_scanning_configuration {
-    scan_on_push = true
-  }
-}
