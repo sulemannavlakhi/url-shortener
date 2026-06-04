@@ -6,4 +6,9 @@ __pycache__/
 *.pyc
 *.out
 .plan
-terraform.tfstate*
+*.tfstate
+*.tfstate.backup
+*.tfvars
+.terraform.tfstate.lock.info
+.terraform.lock.hcl
+.terraform
