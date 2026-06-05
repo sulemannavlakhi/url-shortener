@@ -121,3 +121,42 @@ locals {
   listener_arn = aws_lb_listener.https.arn
 }
 
+resource "aws_lb_listener_rule" "api_host" {
+  listener_arn = local.listener_arn
+  priority     = 10
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.api_blue.arn
+  }
+
+  condition {
+    host_header {
+      values = ["api.example.com"]
+    }
+  }
+
+  lifecycle {
+    ignore_changes = [action]
+  }
+}
+
+resource "aws_lb_listener_rule" "dashboard_host" {
+  listener_arn = local.listener_arn
+  priority     = 20
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.dashboard_blue.arn
+  }
+
+  condition {
+    host_header {
+      values = ["dashboard.example.com"]
+    }
+  }
+
+  lifecycle {
+    ignore_changes = [action]
+  }
+}
