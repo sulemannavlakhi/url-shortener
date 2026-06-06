@@ -51,3 +51,31 @@ resource "aws_vpc_endpoint" "logs" {
     Name = "${var.project_name}-${var.environment}-logs-endpoint"
   }
 }
+
+# vpc endpoint for secret manager 
+resource "aws_vpc_endpoint" "secretsmanager" {
+  vpc_id              = var.vpc_id
+  service_name        = "com.amazonaws.${var.aws_region}.secretsmanager"
+  vpc_endpoint_type   = "Interface"
+  subnet_ids          = var.private_subnet_ids
+  security_group_ids  = [var.endpoint_sg_id]
+  private_dns_enabled = true
+
+  tags = {
+    Name = "${var.project_name}-${var.environment}-secretsmanager-endpoint"
+  }
+}
+
+# vpc endpoint for sqs 
+resource "aws_vpc_endpoint" "sqs" {
+  vpc_id              = var.vpc_id
+  service_name        = "com.amazonaws.${var.aws_region}.sqs"
+  vpc_endpoint_type   = "Interface"
+  subnet_ids          = var.private_subnet_ids
+  security_group_ids  = [var.endpoint_sg_id]
+  private_dns_enabled = true
+
+  tags = {
+    Name = "${var.project_name}-${var.environment}-sqs-endpoint"
+  }
+}
