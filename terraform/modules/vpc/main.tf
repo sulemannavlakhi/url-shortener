@@ -1,3 +1,4 @@
+# main vpc for the project
 resource "aws_vpc" "main" {
   cidr_block           = var.vpc_cidr
   enable_dns_hostnames = true
@@ -9,6 +10,7 @@ resource "aws_vpc" "main" {
   }
 }
 
+# public subnets across 2 availability zones, instances get a public ip
 resource "aws_subnet" "public" {
   count                   = 2
   vpc_id                  = aws_vpc.main.id
@@ -21,6 +23,7 @@ resource "aws_subnet" "public" {
   }
 }
 
+# private subnets across 2 availability zones, no public ip assigned
 resource "aws_subnet" "private" {
   count             = 2
   vpc_id            = aws_vpc.main.id
@@ -32,6 +35,7 @@ resource "aws_subnet" "private" {
   }
 }
 
+# internet gateway so public subnets can reach the internet
 resource "aws_internet_gateway" "main" {
   vpc_id = aws_vpc.main.id
 
@@ -40,6 +44,7 @@ resource "aws_internet_gateway" "main" {
   }
 }
 
+# route table for public subnets, sends all traffic to the internet gateway
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.main.id
 
@@ -53,12 +58,14 @@ resource "aws_route_table" "public" {
   }
 }
 
+# associate public route table with both public subnets
 resource "aws_route_table_association" "public" {
   count          = 2
   subnet_id      = aws_subnet.public[count.index].id
   route_table_id = aws_route_table.public.id
 }
 
+# private route table has no internet route, traffic stays internal
 resource "aws_route_table" "private" {
   vpc_id = aws_vpc.main.id
 
@@ -67,6 +74,7 @@ resource "aws_route_table" "private" {
   }
 }
 
+# associate private route table with both private subnets
 resource "aws_route_table_association" "private" {
   count          = 2
   subnet_id      = aws_subnet.private[count.index].id
