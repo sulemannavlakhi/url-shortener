@@ -85,3 +85,9 @@ resource "aws_wafv2_web_acl" "main" {
     sampled_requests_enabled   = true
   }
 }
+
+# attaches the waf to the alb so all incoming traffic is inspected before reaching the services
+resource "aws_wafv2_web_acl_association" "alb" {
+  resource_arn = var.alb_arn
+  web_acl_arn  = aws_wafv2_web_acl.main.arn
+}
