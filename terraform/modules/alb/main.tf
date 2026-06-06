@@ -1,3 +1,4 @@
+# creating ALB in public subnets
 resource "aws_lb" "alb" {
   name               = "${var.project_name}-${var.environment}-alb"
   internal           = false
@@ -12,6 +13,7 @@ resource "aws_lb" "alb" {
   }
 }
 
+# blue target group for the api
 resource "aws_lb_target_group" "api_blue" {
   name        = "${var.project_name}-${var.environment}-api-blue"
   port        = 8080
@@ -30,6 +32,7 @@ resource "aws_lb_target_group" "api_blue" {
   }
 }
 
+# green target group for the api
 resource "aws_lb_target_group" "api_green" {
   name        = "${var.project_name}-${var.environment}-api-green"
   port        = 8080
@@ -48,6 +51,7 @@ resource "aws_lb_target_group" "api_green" {
   }
 }
 
+# blue target group for the dashboard
 resource "aws_lb_target_group" "dashboard_blue" {
   name        = "${var.project_name}-${var.environment}-dash-blue"
   port        = 8081
@@ -66,6 +70,7 @@ resource "aws_lb_target_group" "dashboard_blue" {
   }
 }
 
+# green target group for the dashboard
 resource "aws_lb_target_group" "dashboard_green" {
   name        = "${var.project_name}-${var.environment}-dash-green"
   port        = 8081
@@ -84,6 +89,7 @@ resource "aws_lb_target_group" "dashboard_green" {
   }
 }
 
+# http listener redirects all traffic to https
 resource "aws_lb_listener" "http" {
   load_balancer_arn = aws_lb.alb.arn
   port              = 80
@@ -100,6 +106,7 @@ resource "aws_lb_listener" "http" {
   }
 }
 
+# https listener, forwards to api blue by default
 resource "aws_lb_listener" "https" {
   load_balancer_arn = aws_lb.alb.arn
   port              = 443
@@ -121,6 +128,7 @@ locals {
   listener_arn = aws_lb_listener.https.arn
 }
 
+# ignore_changes so codedeploy can update the target group without terraform reverting it
 resource "aws_lb_listener_rule" "api_host" {
   listener_arn = local.listener_arn
   priority     = 10
@@ -132,7 +140,7 @@ resource "aws_lb_listener_rule" "api_host" {
 
   condition {
     host_header {
-      values = ["api.example.com"]
+      values = ["api.sulemannav.com"]
     }
   }
 
@@ -141,6 +149,7 @@ resource "aws_lb_listener_rule" "api_host" {
   }
 }
 
+# routes domain to the dashboard service
 resource "aws_lb_listener_rule" "dashboard_host" {
   listener_arn = local.listener_arn
   priority     = 20
@@ -152,7 +161,7 @@ resource "aws_lb_listener_rule" "dashboard_host" {
 
   condition {
     host_header {
-      values = ["dashboard.example.com"]
+      values = ["dashboard.sulemannav.com"]
     }
   }
 
