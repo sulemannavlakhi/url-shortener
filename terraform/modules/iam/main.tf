@@ -41,3 +41,89 @@ resource "aws_iam_role_policy" "execution_secrets" {
     ]
   })
 }
+
+# api task role - the container process assumes this at runtime
+resource "aws_iam_role" "api_task" {
+  name               = "${var.project_name}-${var.environment}-api-task-role"
+  assume_role_policy = data.aws_iam_policy_document.ecs_tasks_assume.json
+}
+
+# api needs to publish click events to sqs and read db creds
+resource "aws_iam_role_policy" "api_task" {
+  name = "${var.project_name}-${var.environment}-api-policy"
+  role = aws_iam_role.api_task.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = ["sqs:SendMessage", "sqs:GetQueueAttributes", "sqs:GetQueueUrl"]
+        Resource = var.sqs_queue_arn
+      },
+      {
+        Effect   = "Allow"
+        Action   = ["secretsmanager:GetSecretValue"]
+        Resource = var.rds_secret_arn
+      }
+    ]
+  })
+}
+
+# worker task role
+resource "aws_iam_role" "worker_task" {
+  name               = "${var.project_name}-${var.environment}-worker-task-role"
+  assume_role_policy = data.aws_iam_policy_document.ecs_tasks_assume.json
+}
+
+# worker polls sqs and writes analytics to rds needs consume permissions
+# changeMessageVisibility lets it extend the timeout if processing takes longer
+resource "aws_iam_role_policy" "worker_task" {
+  name = "${var.project_name}-${var.environment}-worker-policy"
+  role = aws_iam_role.worker_task.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "sqs:ReceiveMessage",
+          "sqs:DeleteMessage",
+          "sqs:ChangeMessageVisibility",
+          "sqs:GetQueueAttributes",
+          "sqs:GetQueueUrl"
+        ]
+        Resource = var.sqs_queue_arn
+      },
+      {
+        Effect   = "Allow"
+        Action   = ["secretsmanager:GetSecretValue"]
+        Resource = var.rds_secret_arn
+      }
+    ]
+  })
+}
+
+# dashboard task role
+resource "aws_iam_role" "dashboard_task" {
+  name               = "${var.project_name}-${var.environment}-dashboard-task-role"
+  assume_role_policy = data.aws_iam_policy_document.ecs_tasks_assume.json
+}
+
+# dashboard is read-only against rds, no queue access needed
+resource "aws_iam_role_policy" "dashboard_task" {
+  name = "${var.project_name}-${var.environment}-dashboard-policy"
+  role = aws_iam_role.dashboard_task.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = ["secretsmanager:GetSecretValue"]
+        Resource = var.rds_secret_arn
+      }
+    ]
+  })
+}
