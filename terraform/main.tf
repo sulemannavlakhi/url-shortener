@@ -44,3 +44,15 @@ module "sqs" {
   project_name = var.project_name
   environment  = var.environment
 }
+
+module "rds" {
+  source = "./modules/rds"
+
+  project_name       = var.project_name
+  environment        = var.environment
+  private_subnet_ids = module.vpc.private_subnet_ids
+  rds_sg_id          = module.sg.rds_sg_id
+  db_name            = var.db_name
+  db_username        = var.db_username
+  db_instance_class  = var.db_instance_class
+}
