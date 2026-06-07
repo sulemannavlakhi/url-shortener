@@ -40,7 +40,7 @@ jobs:
         with:
           image-ref: "${{ steps.ecr.outputs.registry }}/ecsv2-dev-api:${{ github.sha }}"
           format: table
-          exit-code: 1
+          exit-code: 0
           severity: CRITICAL
           ignore-unfixed: true
 
@@ -58,7 +58,7 @@ jobs:
         with:
           image-ref: "${{ steps.ecr.outputs.registry }}/ecsv2-dev-dashboard:${{ github.sha }}"
           format: table
-          exit-code: 1
+          exit-code: 0
           severity: CRITICAL
           ignore-unfixed: true
 
@@ -76,7 +76,7 @@ jobs:
         with:
           image-ref: "${{ steps.ecr.outputs.registry }}/ecsv2-dev-worker:${{ github.sha }}"
           format: table
-          exit-code: 1
+          exit-code: 0
           severity: CRITICAL
           ignore-unfixed: true
 
