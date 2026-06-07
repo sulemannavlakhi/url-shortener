@@ -92,3 +92,11 @@ module "alb" {
   api_hostname              = var.api_hostname
   dashboard_hostname        = var.dashboard_hostname
 }
+
+module "waf" {
+  source = "./modules/waf"
+
+  project_name = var.project_name
+  environment  = var.environment
+  alb_arn      = module.alb.alb_arn
+}
