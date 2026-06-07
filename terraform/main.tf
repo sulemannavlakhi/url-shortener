@@ -100,3 +100,33 @@ module "waf" {
   environment  = var.environment
   alb_arn      = module.alb.alb_arn
 }
+
+module "ecs" {
+  source = "./modules/ecs"
+
+  project_name                  = var.project_name
+  environment                   = var.environment
+  aws_region                    = var.aws_region
+  private_subnet_ids            = module.vpc.private_subnet_ids
+  ecs_sg_id                     = module.sg.ecs_sg_id
+  execution_role_arn            = module.iam.ecs_task_execution_role_arn
+  api_task_role_arn             = module.iam.api_task_role_arn
+  worker_task_role_arn          = module.iam.worker_task_role_arn
+  dashboard_task_role_arn       = module.iam.dashboard_task_role_arn
+  api_image                     = "${module.ecr.repository_urls["api"]}:${var.container_image_tag}"
+  dashboard_image               = "${module.ecr.repository_urls["dashboard"]}:${var.container_image_tag}"
+  worker_image                  = "${module.ecr.repository_urls["worker"]}:${var.container_image_tag}"
+  api_blue_target_group_arn     = module.alb.api_blue_target_group_arn
+  dashboard_blue_target_group_arn = module.alb.dashboard_blue_target_group_arn
+  api_desired_count             = var.api_desired_count
+  dashboard_desired_count       = var.dashboard_desired_count
+  worker_desired_count          = var.worker_desired_count
+  sqs_queue_url                 = module.sqs.queue_url
+  sqs_queue_name                = module.sqs.queue_name
+  db_secret_arn                 = module.rds.db_secret_arn
+  db_host                       = module.rds.db_endpoint
+  db_name                       = var.db_name
+  redis_endpoint                = module.redis.redis_endpoint
+
+  depends_on = [module.vpc_endpoints, module.rds, module.redis]
+}
