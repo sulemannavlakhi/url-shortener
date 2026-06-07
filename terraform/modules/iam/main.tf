@@ -240,6 +240,20 @@ resource "aws_iam_role_policy" "github_actions" {
           "codedeploy:GetDeploymentGroup"
         ]
         Resource = "*"
+      },
+      {
+        # allows pipeline to read and write terraform state in s3
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject",
+          "s3:ListBucket"
+        ]
+        Resource = [
+          "arn:aws:s3:::sulemanecsv2s3",
+          "arn:aws:s3:::sulemanecsv2s3/*"
+        ]
       }
     ]
   })
