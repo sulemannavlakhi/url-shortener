@@ -183,7 +183,7 @@ resource "aws_iam_role" "github_actions" {
   })
 }
 
-# what the pipeline needs in order to do ecr push, task def registration, codedeploy trigger
+# what the pipeline needs to build infrastructure from scratch and deploy
 resource "aws_iam_role_policy" "github_actions" {
   name = "${var.project_name}-${var.environment}-github-actions-policy"
   role = aws_iam_role.github_actions.id
@@ -192,11 +192,13 @@ resource "aws_iam_role_policy" "github_actions" {
     Version = "2012-10-17"
     Statement = [
       {
+        # ecr auth token needed for docker login
         Effect   = "Allow"
         Action   = ["ecr:GetAuthorizationToken"]
         Resource = "*"
       },
       {
+        # push and pull images to ecr repositories
         Effect = "Allow"
         Action = [
           "ecr:BatchCheckLayerAvailability",
@@ -205,22 +207,41 @@ resource "aws_iam_role_policy" "github_actions" {
           "ecr:PutImage",
           "ecr:UploadLayerPart",
           "ecr:BatchGetImage",
-          "ecr:DescribeRepositories"
-        ]
-        Resource = var.ecr_repository_arns
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "ecs:RegisterTaskDefinition",
-          "ecs:DescribeTaskDefinition",
-          "ecs:DescribeServices",
-          "ecs:DescribeClusters",
-          "ecs:UpdateService"
+          "ecr:DescribeRepositories",
+          "ecr:ListTagsForResource",
+          "ecr:CreateRepository",
+          "ecr:DeleteRepository",
+          "ecr:PutLifecyclePolicy",
+          "ecr:GetLifecyclePolicy",
+          "ecr:PutImageTagMutability",
+          "ecr:GetRepositoryPolicy",
+          "ecr:SetRepositoryPolicy",
+          "ecr:TagResource"
         ]
         Resource = "*"
       },
       {
+        # manage ecs cluster, services and task definitions
+        Effect = "Allow"
+        Action = [
+          "ecs:RegisterTaskDefinition",
+          "ecs:DeregisterTaskDefinition",
+          "ecs:DescribeTaskDefinition",
+          "ecs:DescribeServices",
+          "ecs:DescribeClusters",
+          "ecs:UpdateService",
+          "ecs:CreateCluster",
+          "ecs:DeleteCluster",
+          "ecs:CreateService",
+          "ecs:DeleteService",
+          "ecs:ListTagsForResource",
+          "ecs:TagResource",
+          "ecs:PutClusterCapacityProviders"
+        ]
+        Resource = "*"
+      },
+      {
+        # pass execution and task roles to ecs
         Effect   = "Allow"
         Action   = ["iam:PassRole"]
         Resource = [
@@ -231,18 +252,214 @@ resource "aws_iam_role_policy" "github_actions" {
         ]
       },
       {
+        # manage iam roles and oidc provider
+        Effect = "Allow"
+        Action = [
+          "iam:GetRole",
+          "iam:GetRolePolicy",
+          "iam:ListRolePolicies",
+          "iam:ListAttachedRolePolicies",
+          "iam:GetOpenIDConnectProvider",
+          "iam:CreateRole",
+          "iam:PutRolePolicy",
+          "iam:AttachRolePolicy",
+          "iam:DeleteRolePolicy",
+          "iam:DetachRolePolicy",
+          "iam:DeleteRole",
+          "iam:CreateOpenIDConnectProvider",
+          "iam:DeleteOpenIDConnectProvider",
+          "iam:UpdateOpenIDConnectProviderThumbprint",
+          "iam:TagOpenIDConnectProvider"
+        ]
+        Resource = "*"
+      },
+      {
+        # manage vpc, subnets, security groups, route tables, igw, endpoints
+        Effect = "Allow"
+        Action = [
+          "ec2:DescribeVpcs",
+          "ec2:DescribeSubnets",
+          "ec2:DescribeSecurityGroups",
+          "ec2:DescribeRouteTables",
+          "ec2:DescribeInternetGateways",
+          "ec2:DescribeVpcEndpoints",
+          "ec2:DescribeVpcEndpointServices",
+          "ec2:DescribeAvailabilityZones",
+          "ec2:DescribeAccountAttributes",
+          "ec2:DescribeNetworkInterfaces",
+          "ec2:DescribeTags",
+          "ec2:CreateVpc",
+          "ec2:DeleteVpc",
+          "ec2:CreateSubnet",
+          "ec2:DeleteSubnet",
+          "ec2:CreateSecurityGroup",
+          "ec2:DeleteSecurityGroup",
+          "ec2:CreateInternetGateway",
+          "ec2:DeleteInternetGateway",
+          "ec2:AttachInternetGateway",
+          "ec2:DetachInternetGateway",
+          "ec2:CreateRouteTable",
+          "ec2:DeleteRouteTable",
+          "ec2:CreateRoute",
+          "ec2:DeleteRoute",
+          "ec2:AssociateRouteTable",
+          "ec2:DisassociateRouteTable",
+          "ec2:CreateVpcEndpoint",
+          "ec2:DeleteVpcEndpoints",
+          "ec2:ModifyVpcEndpoint",
+          "ec2:ModifyVpcAttribute",
+          "ec2:ModifySubnetAttribute",
+          "ec2:AuthorizeSecurityGroupIngress",
+          "ec2:AuthorizeSecurityGroupEgress",
+          "ec2:RevokeSecurityGroupIngress",
+          "ec2:RevokeSecurityGroupEgress",
+          "ec2:CreateTags"
+        ]
+        Resource = "*"
+      },
+      {
+        # manage sqs queues
+        Effect = "Allow"
+        Action = [
+          "sqs:GetQueueAttributes",
+          "sqs:GetQueueUrl",
+          "sqs:CreateQueue",
+          "sqs:DeleteQueue",
+          "sqs:SetQueueAttributes",
+          "sqs:ListQueueTags",
+          "sqs:TagQueue"
+        ]
+        Resource = "*"
+      },
+      {
+        # manage db credentials in secrets manager
+        Effect = "Allow"
+        Action = [
+          "secretsmanager:DescribeSecret",
+          "secretsmanager:CreateSecret",
+          "secretsmanager:DeleteSecret",
+          "secretsmanager:PutSecretValue",
+          "secretsmanager:GetSecretValue",
+          "secretsmanager:TagResource"
+        ]
+        Resource = "*"
+      },
+      {
+        # manage rds postgres instance and subnet group
+        Effect = "Allow"
+        Action = [
+          "rds:DescribeDBInstances",
+          "rds:DescribeDBSubnetGroups",
+          "rds:CreateDBInstance",
+          "rds:DeleteDBInstance",
+          "rds:ModifyDBInstance",
+          "rds:CreateDBSubnetGroup",
+          "rds:DeleteDBSubnetGroup",
+          "rds:AddTagsToResource",
+          "rds:ListTagsForResource"
+        ]
+        Resource = "*"
+      },
+      {
+        # manage elasticache redis cluster and subnet group
+        Effect = "Allow"
+        Action = [
+          "elasticache:DescribeCacheClusters",
+          "elasticache:DescribeCacheSubnetGroups",
+          "elasticache:CreateCacheCluster",
+          "elasticache:DeleteCacheCluster",
+          "elasticache:CreateCacheSubnetGroup",
+          "elasticache:DeleteCacheSubnetGroup",
+          "elasticache:AddTagsToResource",
+          "elasticache:ListTagsForResource"
+        ]
+        Resource = "*"
+      },
+      {
+        # manage alb, target groups, listeners and rules
+        Effect = "Allow"
+        Action = [
+          "elasticloadbalancing:DescribeLoadBalancers",
+          "elasticloadbalancing:DescribeTargetGroups",
+          "elasticloadbalancing:DescribeListeners",
+          "elasticloadbalancing:DescribeListenerCertificates",
+          "elasticloadbalancing:DescribeRules",
+          "elasticloadbalancing:DescribeTags",
+          "elasticloadbalancing:CreateLoadBalancer",
+          "elasticloadbalancing:DeleteLoadBalancer",
+          "elasticloadbalancing:CreateTargetGroup",
+          "elasticloadbalancing:DeleteTargetGroup",
+          "elasticloadbalancing:CreateListener",
+          "elasticloadbalancing:DeleteListener",
+          "elasticloadbalancing:CreateRule",
+          "elasticloadbalancing:DeleteRule",
+          "elasticloadbalancing:ModifyListener",
+          "elasticloadbalancing:ModifyTargetGroup",
+          "elasticloadbalancing:AddTags",
+          "elasticloadbalancing:SetSecurityGroups"
+        ]
+        Resource = "*"
+      },
+      {
+        # manage waf and attach to alb
+        Effect = "Allow"
+        Action = [
+          "wafv2:GetWebACL",
+          "wafv2:CreateWebACL",
+          "wafv2:DeleteWebACL",
+          "wafv2:UpdateWebACL",
+          "wafv2:AssociateWebACL",
+          "wafv2:DisassociateWebACL",
+          "wafv2:GetWebACLForResource",
+          "wafv2:ListTagsForResource",
+          "wafv2:TagResource"
+        ]
+        Resource = "*"
+      },
+      {
+        # manage cloudwatch log groups for ecs tasks
+        Effect = "Allow"
+        Action = [
+          "logs:DescribeLogGroups",
+          "logs:CreateLogGroup",
+          "logs:DeleteLogGroup",
+          "logs:PutRetentionPolicy",
+          "logs:ListTagsLogGroup",
+          "logs:TagLogGroup"
+        ]
+        Resource = "*"
+      },
+      {
+        # manage codedeploy app and deployment groups
         Effect = "Allow"
         Action = [
           "codedeploy:CreateDeployment",
           "codedeploy:GetDeployment",
           "codedeploy:GetDeploymentConfig",
           "codedeploy:GetApplication",
-          "codedeploy:GetDeploymentGroup"
+          "codedeploy:GetDeploymentGroup",
+          "codedeploy:CreateApplication",
+          "codedeploy:DeleteApplication",
+          "codedeploy:CreateDeploymentGroup",
+          "codedeploy:DeleteDeploymentGroup",
+          "codedeploy:UpdateDeploymentGroup",
+          "codedeploy:ListTagsForResource",
+          "codedeploy:TagResource"
         ]
         Resource = "*"
       },
       {
-        # allows pipeline to read and write terraform state in s3
+        # read acm certificate for alb https listener
+        Effect = "Allow"
+        Action = [
+          "acm:DescribeCertificate",
+          "acm:ListCertificates",
+          "acm:GetCertificate"
+        ]
+        Resource = "*"
+      },
+      {
+        # read and write terraform state in s3
         Effect = "Allow"
         Action = [
           "s3:GetObject",
