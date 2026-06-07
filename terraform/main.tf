@@ -130,3 +130,21 @@ module "ecs" {
 
   depends_on = [module.vpc_endpoints, module.rds, module.redis]
 }
+
+module "codedeploy" {
+  source = "./modules/codedeploy"
+
+  project_name                    = var.project_name
+  environment                     = var.environment
+  codedeploy_role_arn             = module.iam.codedeploy_role_arn
+  ecs_cluster_name                = module.ecs.cluster_name
+  api_service_name                = module.ecs.api_service_name
+  dashboard_service_name          = module.ecs.dashboard_service_name
+  alb_listener_arn                = module.alb.https_listener_arn != "" ? module.alb.https_listener_arn : module.alb.http_listener_arn
+  api_blue_target_group_name      = module.alb.api_blue_target_group_name
+  api_green_target_group_name     = module.alb.api_green_target_group_name
+  dashboard_blue_target_group_name  = module.alb.dashboard_blue_target_group_name
+  dashboard_green_target_group_name = module.alb.dashboard_green_target_group_name
+
+  depends_on = [module.ecs]
+}
