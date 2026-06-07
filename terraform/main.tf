@@ -66,3 +66,16 @@ module "redis" {
   redis_sg_id        = module.sg.redis_sg_id
   node_type          = var.redis_node_type
 }
+
+module "iam" {
+  source = "./modules/iam"
+
+  project_name        = var.project_name
+  environment         = var.environment
+  aws_region          = var.aws_region
+  github_repo         = var.github_repo
+  github_branch       = var.github_branch
+  sqs_queue_arn       = module.sqs.queue_arn
+  rds_secret_arn      = module.rds.db_secret_arn
+  ecr_repository_arns = module.ecr.repository_arns
+}
