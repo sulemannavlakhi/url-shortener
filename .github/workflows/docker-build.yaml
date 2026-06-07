@@ -30,20 +30,53 @@ jobs:
         id: ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build and push API
+      - name: Build API image
         run: |
-          IMAGE="${{ steps.ecr.outputs.registry }}/ecsv2-dev-api"
-          docker build -t "$IMAGE:${{ github.sha }}" -t "$IMAGE:latest" ./app
-          docker push "$IMAGE:${{ github.sha }}"
+          IMAGE="${{ steps.ecr.outputs.registry }}/ecsv2-dev-api:${{ github.sha }}"
+          docker build -t "$IMAGE" ./app
 
-      - name: Build and push Dashboard
-        run: |
-          IMAGE="${{ steps.ecr.outputs.registry }}/ecsv2-dev-dashboard"
-          docker build -t "$IMAGE:${{ github.sha }}" -t "$IMAGE:latest" ./services/dashboard
-          docker push "$IMAGE:${{ github.sha }}"
+      - name: Scan API image
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: "${{ steps.ecr.outputs.registry }}/ecsv2-dev-api:${{ github.sha }}"
+          format: table
+          exit-code: 1
+          severity: CRITICAL
 
-      - name: Build and push Worker
+      - name: Push API image
         run: |
-          IMAGE="${{ steps.ecr.outputs.registry }}/ecsv2-dev-worker"
-          docker build -t "$IMAGE:${{ github.sha }}" -t "$IMAGE:latest" ./services/worker
-          docker push "$IMAGE:${{ github.sha }}"
+          docker push "${{ steps.ecr.outputs.registry }}/ecsv2-dev-api:${{ github.sha }}"
+
+      - name: Build Dashboard image
+        run: |
+          IMAGE="${{ steps.ecr.outputs.registry }}/ecsv2-dev-dashboard:${{ github.sha }}"
+          docker build -t "$IMAGE" ./services/dashboard
+
+      - name: Scan Dashboard image
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: "${{ steps.ecr.outputs.registry }}/ecsv2-dev-dashboard:${{ github.sha }}"
+          format: table
+          exit-code: 1
+          severity: CRITICAL
+
+      - name: Push Dashboard image
+        run: |
+          docker push "${{ steps.ecr.outputs.registry }}/ecsv2-dev-dashboard:${{ github.sha }}"
+
+      - name: Build Worker image
+        run: |
+          IMAGE="${{ steps.ecr.outputs.registry }}/ecsv2-dev-worker:${{ github.sha }}"
+          docker build -t "$IMAGE" ./services/worker
+
+      - name: Scan Worker image
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: "${{ steps.ecr.outputs.registry }}/ecsv2-dev-worker:${{ github.sha }}"
+          format: table
+          exit-code: 1
+          severity: CRITICAL
+
+      - name: Push Worker image
+        run: |
+          docker push "${{ steps.ecr.outputs.registry }}/ecsv2-dev-worker:${{ github.sha }}"
