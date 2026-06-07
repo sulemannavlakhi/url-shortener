@@ -25,3 +25,15 @@ module "sg" {
   vpc_id                     = module.vpc.vpc_id
   allowed_alb_ingress_cidrs  = var.allowed_alb_ingress_cidrs
 }
+
+module "vpc_endpoints" {
+  source = "./modules/vpc_endpoints"
+
+  project_name           = var.project_name
+  environment            = var.environment
+  aws_region             = var.aws_region
+  vpc_id                 = module.vpc.vpc_id
+  private_subnet_ids     = module.vpc.private_subnet_ids
+  private_route_table_id = module.vpc.private_route_table_id
+  endpoint_sg_id         = module.sg.vpc_endpoint_sg_id
+}
