@@ -313,7 +313,7 @@ resource "aws_iam_role_policy" "github_actions" {
           "ec2:AuthorizeSecurityGroupEgress",
           "ec2:RevokeSecurityGroupIngress",
           "ec2:RevokeSecurityGroupEgress",
-          "ec2:CreateTags"
+          "ec2:CreateTags",
           "ec2:DescribeVpcAttribute"
         ]
         Resource = "*"
@@ -341,7 +341,7 @@ resource "aws_iam_role_policy" "github_actions" {
           "secretsmanager:DeleteSecret",
           "secretsmanager:PutSecretValue",
           "secretsmanager:GetSecretValue",
-          "secretsmanager:TagResource"
+          "secretsmanager:TagResource",
           "secretsmanager:GetResourcePolicy"
         ]
         Resource = "*"
