@@ -79,3 +79,16 @@ module "iam" {
   rds_secret_arn      = module.rds.db_secret_arn
   ecr_repository_arns = module.ecr.repository_arns
 }
+
+module "alb" {
+  source = "./modules/alb"
+
+  project_name              = var.project_name
+  environment               = var.environment
+  vpc_id                    = module.vpc.vpc_id
+  public_subnet_ids         = module.vpc.public_subnet_ids
+  alb_sg_id                 = module.sg.alb_sg_id
+  certificate_arn           = var.certificate_arn
+  api_hostname              = var.api_hostname
+  dashboard_hostname        = var.dashboard_hostname
+}
