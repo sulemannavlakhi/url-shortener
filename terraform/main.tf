@@ -37,3 +37,10 @@ module "vpc_endpoints" {
   private_route_table_id = module.vpc.private_route_table_id
   endpoint_sg_id         = module.sg.vpc_endpoint_sg_id
 }
+
+module "sqs" {
+  source = "./modules/sqs"
+
+  project_name = var.project_name
+  environment  = var.environment
+}
