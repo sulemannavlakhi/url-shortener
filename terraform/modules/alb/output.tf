@@ -1,9 +1,13 @@
 output "alb_arn" {
-  value = aws_lb.main.arn
+  value = aws_lb.alb.arn
 }
 
 output "alb_dns_name" {
-  value = aws_lb.main.dns_name
+  value = aws_lb.alb.dns_name
+}
+
+output "alb_zone_id" {
+  value = aws_lb.alb.zone_id
 }
 
 output "http_listener_arn" {
@@ -11,7 +15,7 @@ output "http_listener_arn" {
 }
 
 output "https_listener_arn" {
-  value = length(aws_lb_listener.https) > 0 ? aws_lb_listener.https[0].arn : ""
+  value = aws_lb_listener.https.arn
 }
 
 output "api_blue_target_group_arn" {
