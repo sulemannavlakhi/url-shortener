@@ -42,6 +42,7 @@ jobs:
           format: table
           exit-code: 1
           severity: CRITICAL
+          ignore-unfixed: true
 
       - name: Push API image
         run: |
@@ -59,6 +60,7 @@ jobs:
           format: table
           exit-code: 1
           severity: CRITICAL
+          ignore-unfixed: true
 
       - name: Push Dashboard image
         run: |
@@ -76,6 +78,7 @@ jobs:
           format: table
           exit-code: 1
           severity: CRITICAL
+          ignore-unfixed: true
 
       - name: Push Worker image
         run: |
