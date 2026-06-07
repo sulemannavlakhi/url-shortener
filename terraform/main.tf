@@ -56,3 +56,13 @@ module "rds" {
   db_username        = var.db_username
   db_instance_class  = var.db_instance_class
 }
+
+module "redis" {
+  source = "./modules/redis"
+
+  project_name       = var.project_name
+  environment        = var.environment
+  private_subnet_ids = module.vpc.private_subnet_ids
+  redis_sg_id        = module.sg.redis_sg_id
+  node_type          = var.redis_node_type
+}
