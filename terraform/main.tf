@@ -16,3 +16,12 @@ module "ecr" {
   environment  = var.environment
   services     = ["api", "dashboard", "worker"]
 }
+
+module "sg" {
+  source = "./modules/sg"
+
+  project_name               = var.project_name
+  environment                = var.environment
+  vpc_id                     = module.vpc.vpc_id
+  allowed_alb_ingress_cidrs  = var.allowed_alb_ingress_cidrs
+}
