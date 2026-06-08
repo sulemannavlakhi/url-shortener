@@ -314,7 +314,8 @@ resource "aws_iam_role_policy" "github_actions" {
           "ec2:RevokeSecurityGroupIngress",
           "ec2:RevokeSecurityGroupEgress",
           "ec2:CreateTags",
-          "ec2:DescribeVpcAttribute"
+          "ec2:DescribeVpcAttribute",
+          "ec2:DescribePrefixLists"
         ]
         Resource = "*"
       },
