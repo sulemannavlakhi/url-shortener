@@ -398,7 +398,9 @@ resource "aws_iam_role_policy" "github_actions" {
           "elasticloadbalancing:ModifyListener",
           "elasticloadbalancing:ModifyTargetGroup",
           "elasticloadbalancing:AddTags",
-          "elasticloadbalancing:SetSecurityGroups"
+          "elasticloadbalancing:SetSecurityGroups",
+          "elasticloadbalancing:ModifyLoadBalancerAttributes",
+          "elasticloadbalancing:ModifyTargetGroupAttributes"
         ]
         Resource = "*"
       },
