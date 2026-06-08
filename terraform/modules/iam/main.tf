@@ -248,7 +248,8 @@ resource "aws_iam_role_policy" "github_actions" {
           aws_iam_role.execution.arn,
           aws_iam_role.api_task.arn,
           aws_iam_role.worker_task.arn,
-          aws_iam_role.dashboard_task.arn
+          aws_iam_role.dashboard_task.arn,
+          aws_iam_role.codedeploy.arn
         ]
       },
       {
