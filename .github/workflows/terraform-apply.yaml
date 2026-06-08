@@ -40,5 +40,5 @@ jobs:
       - name: Terraform Plan and Apply
         working-directory: terraform
         run: |
-          terraform plan -var-file="terraform.tfvars" -out=tfplan
+          terraform plan -var-file="terraform.tfvars" -var="container_image_tag=${{ github.sha }}" -out=tfplan
           terraform apply -auto-approve tfplan
