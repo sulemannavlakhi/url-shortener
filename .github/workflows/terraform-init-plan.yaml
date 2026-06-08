@@ -1,7 +1,7 @@
 name: Terraform Init and Plan
 
 on:
-  push:
+  pull_request:
     branches: [main]
   workflow_dispatch:
 
