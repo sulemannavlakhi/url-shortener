@@ -32,8 +32,8 @@ jobs:
 
       - name: Build API image
         run: |
-          IMAGE="${{ steps.ecr.outputs.registry }}/ecsv2-dev-api:${{ github.sha }}"
-          docker build -t "$IMAGE" ./app
+          IMAGE="${{ steps.ecr.outputs.registry }}/ecsv2-dev-api"
+          docker build -t "$IMAGE:${{ github.sha }}" -t "$IMAGE:latest" ./app
 
       - name: Scan API image
         uses: aquasecurity/trivy-action@master
@@ -46,12 +46,14 @@ jobs:
 
       - name: Push API image
         run: |
-          docker push "${{ steps.ecr.outputs.registry }}/ecsv2-dev-api:${{ github.sha }}"
+          IMAGE="${{ steps.ecr.outputs.registry }}/ecsv2-dev-api"
+          docker push "$IMAGE:${{ github.sha }}"
+          docker push "$IMAGE:latest"
 
       - name: Build Dashboard image
         run: |
-          IMAGE="${{ steps.ecr.outputs.registry }}/ecsv2-dev-dashboard:${{ github.sha }}"
-          docker build -t "$IMAGE" ./services/dashboard
+          IMAGE="${{ steps.ecr.outputs.registry }}/ecsv2-dev-dashboard"
+          docker build -t "$IMAGE:${{ github.sha }}" -t "$IMAGE:latest" ./services/dashboard
 
       - name: Scan Dashboard image
         uses: aquasecurity/trivy-action@master
@@ -64,12 +66,14 @@ jobs:
 
       - name: Push Dashboard image
         run: |
-          docker push "${{ steps.ecr.outputs.registry }}/ecsv2-dev-dashboard:${{ github.sha }}"
+          IMAGE="${{ steps.ecr.outputs.registry }}/ecsv2-dev-dashboard"
+          docker push "$IMAGE:${{ github.sha }}"
+          docker push "$IMAGE:latest"
 
       - name: Build Worker image
         run: |
-          IMAGE="${{ steps.ecr.outputs.registry }}/ecsv2-dev-worker:${{ github.sha }}"
-          docker build -t "$IMAGE" ./services/worker
+          IMAGE="${{ steps.ecr.outputs.registry }}/ecsv2-dev-worker"
+          docker build -t "$IMAGE:${{ github.sha }}" -t "$IMAGE:latest" ./services/worker
 
       - name: Scan Worker image
         uses: aquasecurity/trivy-action@master
@@ -82,4 +86,6 @@ jobs:
 
       - name: Push Worker image
         run: |
-          docker push "${{ steps.ecr.outputs.registry }}/ecsv2-dev-worker:${{ github.sha }}"
+          IMAGE="${{ steps.ecr.outputs.registry }}/ecsv2-dev-worker"
+          docker push "$IMAGE:${{ github.sha }}"
+          docker push "$IMAGE:latest"
