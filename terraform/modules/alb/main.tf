@@ -23,7 +23,7 @@ resource "aws_lb_target_group" "api_blue" {
 
   health_check {
     enabled             = true
-    path                = "/health"
+    path                = "/healthz"
     matcher             = "200-399"
     interval            = 30
     timeout             = 5
@@ -42,7 +42,7 @@ resource "aws_lb_target_group" "api_green" {
 
   health_check {
     enabled             = true
-    path                = "/health"
+    path                = "/healthz"
     matcher             = "200-399"
     interval            = 30
     timeout             = 5
@@ -61,7 +61,7 @@ resource "aws_lb_target_group" "dashboard_blue" {
 
   health_check {
     enabled             = true
-    path                = "/health"
+    path                = "/healthz"
     matcher             = "200-399"
     interval            = 30
     timeout             = 5
@@ -80,7 +80,7 @@ resource "aws_lb_target_group" "dashboard_green" {
 
   health_check {
     enabled             = true
-    path                = "/health"
+    path                = "/healthz"
     matcher             = "200-399"
     interval            = 30
     timeout             = 5
