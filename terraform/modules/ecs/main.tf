@@ -94,6 +94,7 @@ resource "aws_ecs_task_definition" "dashboard" {
       ]
 
       environment = [
+        { name = "DATABASE_URL", value = "postgresql://${var.db_username}:${var.db_password}@${var.db_host}/${var.db_name}?sslmode=require" },
         { name = "PORT", value = "8081" },
         { name = "DB_HOST", value = var.db_host },
         { name = "DB_NAME", value = var.db_name },
