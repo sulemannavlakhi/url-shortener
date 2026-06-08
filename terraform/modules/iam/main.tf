@@ -403,7 +403,9 @@ resource "aws_iam_role_policy" "github_actions" {
           "elasticloadbalancing:ModifyLoadBalancerAttributes",
           "elasticloadbalancing:ModifyTargetGroupAttributes",
           "elasticloadbalancing:DescribeLoadBalancerAttributes",
-          "elasticloadbalancing:DescribeTargetGroupAttributes"
+          "elasticloadbalancing:DescribeTargetGroupAttributes",
+          "elasticloadbalancing:DescribeListenerAttributes",
+          "elasticloadbalancing:SetWebACL"
         ]
         Resource = "*"
       },
@@ -432,7 +434,8 @@ resource "aws_iam_role_policy" "github_actions" {
           "logs:DeleteLogGroup",
           "logs:PutRetentionPolicy",
           "logs:ListTagsLogGroup",
-          "logs:TagLogGroup"
+          "logs:TagLogGroup",
+          "logs:ListTagsForResource"
         ]
         Resource = "*"
       },
