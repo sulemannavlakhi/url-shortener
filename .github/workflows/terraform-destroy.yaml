@@ -1,0 +1,40 @@
+name: Terraform Destroy
+
+on:
+  workflow_dispatch:
+
+jobs:
+  destroy:
+    runs-on: ubuntu-latest
+
+    permissions:
+        id-token: write
+        contents: read
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+         aws-region: ${{ secrets.AWS_REGION }}
+         role-to-assume: ${{ secrets.AWS_CRED }}
+         role-session-name: terraform-destroy
+
+      - name: Terraform Install
+        uses: hashicorp/setup-terraform@v4
+
+      - name: Terraform Init
+        working-directory: terraform
+        run: terraform init
+
+      - name: Create tfvars file
+        working-directory: terraform
+        env:
+          TF_VARS_CONTENT: ${{ secrets.TF_VARS }}
+        run: echo "$TF_VARS_CONTENT" > terraform.tfvars
+
+      - name: Terraform Destroy
+        working-directory: terraform
+        run: terraform destroy -auto-approve -var-file="terraform.tfvars" -lock-timeout=60s
