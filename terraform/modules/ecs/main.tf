@@ -132,10 +132,9 @@ resource "aws_ecs_task_definition" "worker" {
       essential = true
 
       environment = [
+        { name = "DATABASE_URL", value = "postgresql://${var.db_username}:${var.db_password}@${var.db_host}/${var.db_name}?sslmode=require" },
         { name = "SQS_QUEUE_URL", value = var.sqs_queue_url },
         { name = "SQS_QUEUE_NAME", value = var.sqs_queue_name },
-        { name = "DB_HOST", value = var.db_host },
-        { name = "DB_NAME", value = var.db_name },
         { name = "AWS_REGION", value = var.aws_region }
       ]
 
