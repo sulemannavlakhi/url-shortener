@@ -45,6 +45,7 @@ resource "aws_ecs_task_definition" "api" {
       ]
 
       environment = [
+        { name = "DATABASE_URL", value = "postgresql://${var.db_username}:${var.db_password}@${var.db_host}/${var.db_name}?sslmode=require" },
         { name = "PORT", value = "8080" },
         { name = "SQS_QUEUE_URL", value = var.sqs_queue_url },
         { name = "SQS_QUEUE_NAME", value = var.sqs_queue_name },
