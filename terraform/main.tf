@@ -127,6 +127,8 @@ module "ecs" {
   db_host                       = module.rds.db_endpoint
   db_name                       = var.db_name
   redis_endpoint                = module.redis.redis_endpoint
+  db_username                   = var.db_username
+  db_password                   = var.db_password
 
   depends_on = [module.vpc_endpoints, module.rds, module.redis]
 }
