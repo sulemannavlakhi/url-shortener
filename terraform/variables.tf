@@ -122,3 +122,14 @@ variable "allowed_alb_ingress_cidrs" {
   type        = list(string)
   default     = ["0.0.0.0/0"]
 }
+
+variable "db_username" {
+  description = "RDS database username"
+  type        = string
+}
+
+variable "db_password" {
+  description = "RDS database password"
+  type        = string
+  sensitive   = true
+}
