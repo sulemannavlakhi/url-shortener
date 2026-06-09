@@ -1,4 +1,4 @@
-# URL Shortener — Production-Grade AWS Deployment
+# URL Shortener Production-Grade AWS Deployment
 
 ## Introduction
 
