@@ -6,14 +6,11 @@ This project is a URL shortening service with click analytics, built and deploye
 
 The goal was to take provided application code and build everything around it in a way that reflects real production engineering standards. This meant making deliberate decisions about security, cost, reliability, and deployment safety rather than just getting the services running.
 
-The result is a fully automated system where a developer merging a pull request triggers a pipeline that builds, scans, and deploys all three services to AWS ECS Fargate with zero downtime. Traffic shifts gradually from the old version to the new one using a canary deployment strategy, and automatically rolls back if health checks fail. No manual steps, no hardcoded secrets, no long-lived credentials.
-
-**Business benefits:** Zero-downtime deployments mean customers are never affected by releases. Automatic rollback on failure reduces the risk of a bad deployment staying live. The canary strategy shifts only 10% of traffic to a new version first, limiting the blast radius of any issue. Infrastructure is defined as code, meaning environments are reproducible and teardown is a single command, reducing cloud spend when not in use.
+The result is a fully automated system where a developer pushing to main triggers a pipeline that builds, scans, and deploys all three services to AWS ECS Fargate with zero downtime. Traffic shifts gradually from the old version to the new one using a canary deployment strategy, and automatically rolls back if health checks fail. No manual steps, no hardcoded secrets, no long-lived credentials.
 
 ## Architecture
 
-![Architecture Diagram](images/Architecture diagram.drawio.png)
-
+![Architecture Diagram](images/architecture.png)
 ---
 
 ## Decisions, Trade-offs, and Database Justification
