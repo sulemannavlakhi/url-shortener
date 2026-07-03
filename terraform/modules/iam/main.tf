@@ -455,7 +455,8 @@ resource "aws_iam_role_policy" "github_actions" {
           "codedeploy:DeleteDeploymentGroup",
           "codedeploy:UpdateDeploymentGroup",
           "codedeploy:ListTagsForResource",
-          "codedeploy:TagResource"
+          "codedeploy:TagResource",
+          "codedeploy:RegisterApplicationRevision"
         ]
         Resource = "*"
       },
