@@ -137,3 +137,6 @@ new version is live
 
 ### Terraform Apply Pipeline
 ![Terraform Apply](images/Terraform-apply.png)
+
+### ECS CodeDeploy Pipeline 
+![ECS Code Deploy](images/ecs-codedeploy-pipeline.png)
