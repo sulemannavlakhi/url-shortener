@@ -51,26 +51,26 @@ Multi-stage Dockerfiles were written for all three services. The build stage com
 All infrastructure is defined in Terraform and organised into modules. Remote state is stored in S3 with file-based locking. The objective was to create repeatable, consistent infrastructure that can be deployed and torn down reliably, reducing manual effort and saving engineers hours of work.
 
 ### AWS Services
-- **ECS Fargate** — serverless container runtime, three services on one cluster
-- **ALB** — application load balancer routing traffic by hostname to the correct service
-- **WAF** — web application firewall blocking common attacks and rate limiting by IP
-- **RDS PostgreSQL** — relational database for URL mappings and click analytics
-- **ElastiCache Redis** — in-memory cache for URL lookups on the redirect path
-- **SQS** — decoupled queue for click events between the API and worker
-- **ECR** — private container registry storing images tagged by git SHA
-- **CodeDeploy** — blue/green deployment orchestration with canary traffic shifting
-- **Secrets Manager** — stores RDS credentials, injected into containers at runtime by ECS
-- **VPC Endpoints** — private connectivity to AWS services without NAT gateways
-- **CloudWatch** — log aggregation for all three services
-- **ACM** — SSL certificate for HTTPS on the ALB
-- **IAM** — least-privilege roles for ECS tasks, CodeDeploy, and GitHub Actions
+- **ECS Fargate**: serverless container runtime, three services on one cluster
+- **ALB**: application load balancer routing traffic by hostname to the correct service
+- **WAF**: web application firewall blocking common attacks and rate limiting by IP
+- **RDS PostgreSQL**: relational database for URL mappings and click analytics
+- **ElastiCache Redis**: in-memory cache for URL lookups on the redirect path
+- **SQS**: decoupled queue for click events between the API and worker
+- **ECR**: private container registry storing images tagged by git SHA
+- **CodeDeploy**: blue/green deployment orchestration with canary traffic shifting
+- **Secrets Manager**: stores RDS credentials, injected into containers at runtime by ECS
+- **VPC Endpoints**: private connectivity to AWS services without NAT gateways
+- **CloudWatch**: log aggregation for all three services
+- **ACM**: SSL certificate for HTTPS on the ALB
+- **IAM**: least-privilege roles for ECS tasks, CodeDeploy, and GitHub Actions
 
 ### GitHub Actions
 Three pipelines manage the full delivery lifecycle:
 
-1. **Docker Build and Push** — triggered on push to main. Builds images for all three services, scans each with Trivy for critical vulnerabilities, and pushes to ECR tagged with the git SHA and latest.
-2. **Terraform Apply** — triggered on push to main after the Docker pipeline. Runs `terraform plan` and `terraform apply` to ensure infrastructure matches the configuration. Includes Checkov and TFLint scans for security and best practices.
-3. **ECS Deploy** — manually triggered. Fetches the latest task definition ARN for each service and creates a CodeDeploy deployment, triggering the blue/green traffic shift.
+1. **Docker Build and Push** triggered on push to main. Builds images for all three services, scans each with Trivy for critical vulnerabilities, and pushes to ECR tagged with the git SHA and latest.
+2. **Terraform Apply** triggered on push to main after the Docker pipeline. Runs `terraform plan` and `terraform apply` to ensure infrastructure matches the configuration. Includes Checkov and TFLint scans for security and best practices.
+3. **ECS Deploy** manually triggered. Fetches the latest task definition ARN for each service and creates a CodeDeploy deployment, triggering the blue/green traffic shift.
 
 ---
 
